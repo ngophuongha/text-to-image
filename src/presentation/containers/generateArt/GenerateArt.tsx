@@ -12,7 +12,7 @@ import styles from "./styles.module.scss";
 interface IGenerateArt {
   initialValue?: string;
 }
-const API_URL = "http://localhost:8080/webapp-artgen/generate";
+const API_URL = "https://api.artiesense.com/webapp-artgen/generate";
 export const GenerateArt = ({ initialValue = "" }: IGenerateArt) => {
   const [val, setVal] = useState(initialValue);
 
