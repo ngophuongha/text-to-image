@@ -1,6 +1,5 @@
 import { faCircleXmark } from "@fortawesome/free-regular-svg-icons";
 import {
-  faClose,
   faPaintbrush,
   faPalette,
 } from "@fortawesome/free-solid-svg-icons";
@@ -13,7 +12,7 @@ import styles from "./styles.module.scss";
 interface IGenerateArt {
   initialValue?: string;
 }
-const API_URL = "https://api.artiesense.com/webapp-artgen/generate";
+const API_URL = "http://localhost:8080/webapp-artgen/generate";
 export const GenerateArt = ({ initialValue = "" }: IGenerateArt) => {
   const [val, setVal] = useState(initialValue);
 
@@ -31,8 +30,19 @@ export const GenerateArt = ({ initialValue = "" }: IGenerateArt) => {
           action: "homepage",
         })
         .then((token: string) => {
+          const requestOptions = {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              prompt: val,
+              captchaToken: token,
+              imageNum: 4
+            })
+          };
           return fetch(
-            `${API_URL}?prompt=${val}&captchaToken=${token}&imageNum=${4}`
+            `${API_URL}`, requestOptions
           ).then((values) => values.json());
         });
     });
