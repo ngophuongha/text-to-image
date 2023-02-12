@@ -1,0 +1,21 @@
+.slide {
+  margin-right: 30px;
+  margin-left: 30px;
+}
+.slider-container {
+  display: flex;
+  align-items: center;
+}
+.started-btn:hover {
+  color: #0d324d;
+  font-weight: 600;
+}
+@media screen and (min-width: 768px) {
+  .slide {
+    margin-right: 20px;
+    margin-left: 0px;
+  }
+  .slider-container {
+    width: 60vw;
+  }
+}
