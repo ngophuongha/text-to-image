@@ -1,72 +1,45 @@
 import { faCircleXmark } from "@fortawesome/free-regular-svg-icons";
 import {
+  faDownload,
   faPaintbrush,
   faPalette,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import classNames from "classnames";
-import { useEffect, useState } from "react";
 import { primaryColor, secondaryColor } from "../../constants/color";
 import styles from "./styles.module.scss";
-
+import { useGenerateArt } from "../../../application/useGenerateArt";
 interface IGenerateArt {
   initialValue?: string;
 }
-const API_URL = "https://api.artiesense.com/webapp-artgen/generate";
+
 export const GenerateArt = ({ initialValue = "" }: IGenerateArt) => {
-  const [val, setVal] = useState(initialValue);
-
-  useEffect(() => {
-    setVal(initialValue);
-  }, [initialValue]);
-
-  const submitVal = async () => {
-    // Add your logic to submit to your backend server here.
-    // @ts-ignore
-    window.grecaptcha.ready((_) => {
-      // @ts-ignore
-      window.grecaptcha
-        .execute("6LeVTWskAAAAADcBQy_gIoLWi_nbW12i91922z5F", {
-          action: "homepage",
-        })
-        .then((token: string) => {
-          const requestOptions = {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              prompt: val,
-              captchaToken: token,
-              imageNum: 4
-            })
-          };
-          return fetch(
-            `${API_URL}`, requestOptions
-          ).then((values) => values.json());
-        });
-    });
-  };
-
-  useEffect(() => {
-    // Add reCaptcha
-    const script = document.createElement("script");
-    script.src =
-      "https://www.google.com/recaptcha/api.js?render=6LeVTWskAAAAADcBQy_gIoLWi_nbW12i91922z5F";
-    document.body.appendChild(script);
-  }, []);
+  const {
+    connectionStatus,
+    isLoading,
+    msgHistory,
+    result,
+    submitVal,
+    setVal,
+    val,
+    setMsgHistory,
+  } = useGenerateArt(initialValue);
 
   return (
     <section
       id="gen-art"
-      className="bg-white h-screen flex flex-col items-center justify-center px-6 md:px-0"
+      className="bg-white flex flex-col items-center justify-center px-6 md:px-0"
       style={{
-        // backgroundImage: "linear-gradient(#283452, #976894, #d5bdc3, #f8f4f3)",
         color: primaryColor,
+        minHeight: "100vh",
       }}
     >
       <h1 className="text-3xl font-medium tracking-tight text-center">
-        Let's describe what you want to see{" "}
+        {isLoading
+          ? "Hold on, just a little bit more to see fabulous things"
+          : result.length === 0
+          ? "Let's describe what you want to see "
+          : "Here's what we thought you'd love to see"}
         <FontAwesomeIcon icon={faPalette} color={secondaryColor} />
         <FontAwesomeIcon
           icon={faPaintbrush}
@@ -98,7 +71,10 @@ export const GenerateArt = ({ initialValue = "" }: IGenerateArt) => {
             </div>
 
             <button
-              onClick={() => setVal("")}
+              onClick={() => {
+                setVal("");
+                setMsgHistory([]);
+              }}
               className="absolute right-4"
               style={{
                 height: "50px",
@@ -138,6 +114,32 @@ export const GenerateArt = ({ initialValue = "" }: IGenerateArt) => {
           <span>
             <b>Resolution:</b> 512 x 512
           </span>
+        </div>
+        <div
+          className={
+            "flex flex-col md:flex-row flex-wrap justify-center mt-8 items-center"
+          }
+        >
+          {msgHistory &&
+            msgHistory.map((it) => (
+              <div
+                className="relative"
+                style={{
+                  width: "40%",
+                  marginRight: "12px",
+                  marginBottom: "12px",
+                }}
+              >
+                <img
+                  src={it}
+                  // width={"30%"}
+                  style={{}}
+                />
+                <a href={it} download className="absolute bottom-4 right-4">
+                  <FontAwesomeIcon icon={faDownload} color={"#fff"} />
+                </a>
+              </div>
+            ))}
         </div>
       </form>
     </section>
